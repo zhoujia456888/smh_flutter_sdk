@@ -13,5 +13,5 @@ dependencies:
   convert:
   connectivity_plus:
   crypto: ^3.0.1
-  intl: 0.17.0
+  intl: ^0.18.0
   package_info_plus:
