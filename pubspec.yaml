@@ -10,8 +10,8 @@ dependencies:
     sdk: flutter
   dio: 4.0.6
   crclib: ^3.0.0
-  convert:
-  connectivity_plus:
-  crypto: ^3.0.1
-  intl: ^0.18.0
-  package_info_plus:
+  convert: ^3.1.1
+  connectivity_plus: ^5.0.0
+  crypto: ^3.0.3
+  intl: ^0.18.1
+  package_info_plus: ^5.0.0
