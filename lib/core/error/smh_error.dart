@@ -38,16 +38,16 @@ class SMHError extends Error {
   }
 
   void checkNetWorkState() {
-    if (this.error is DioError &&
-        (this.error as DioError).type == DioErrorType.other &&
-        ((this.error as DioError).error is SocketException)) {
+    if (this.error is DioExceptionType &&
+        this.error  == DioExceptionType.unknown &&
+        (this.error  is SocketException)) {
       this.smhCode = "CheckTheNetworkStatus";
       this.smhZhMessage = "请检查网络状态";
       this.smhMessage = "check the network status";
     }
 
-    if (this.error is DioError &&
-        (this.error as DioError).type == DioErrorType.connectTimeout) {
+    if (this.error is DioExceptionType &&
+        this.error  == DioExceptionType.connectionTimeout) {
       this.smhCode = "ConnectTimeout";
       this.smhZhMessage = "网络连接超时";
       this.smhMessage = "connect timeout";

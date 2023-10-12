@@ -82,8 +82,7 @@ class SMHApiTransferApis {
     int? slice,
     String? confirmKey,
     bool enableVerification = false,
-    SMHConflictResolutionStrategy conflictResolutionStrategy =
-        SMHConflictResolutionStrategy.rename,
+    SMHConflictResolutionStrategy conflictResolutionStrategy = SMHConflictResolutionStrategy.rename,
     SMHConfirmKeyCalBack? confirmKeyCalBack,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
@@ -138,8 +137,7 @@ class SMHApiTransferApis {
     String? confirmKey,
     CancelToken? cancelToken,
     bool enableVerification = false,
-    SMHConflictResolutionStrategy conflictResolutionStrategy =
-        SMHConflictResolutionStrategy.rename,
+    SMHConflictResolutionStrategy conflictResolutionStrategy = SMHConflictResolutionStrategy.rename,
     SMHConfirmKeyCalBack? confirmKeyCalBack,
     ProgressCallback? onSendProgress,
   }) async {
@@ -206,8 +204,7 @@ class SMHApiTransferApis {
       final beginHash = _uploadBody!.sublist(0, SMHUploadSlinceLength);
       beginningHash = sha256.convert(beginHash);
     } else if (_uploadFile != null) {
-      final beginHash =
-          await toBytes(_uploadFile!.openRead(0, SMHUploadSlinceLength));
+      final beginHash = await toBytes(_uploadFile!.openRead(0, SMHUploadSlinceLength));
       beginningHash = sha256.convert(beginHash);
     }
 
@@ -239,10 +236,7 @@ class SMHApiTransferApis {
             'user_id': _userId,
             'access_token': accessToken
           },
-          body: {
-            "beginningHash": beginningHash.toString(),
-            "size": _length.toString()
-          });
+          body: {"beginningHash": beginningHash.toString(), "size": _length.toString()});
     } on SMHError catch (e) {
       _finishCalBack(null, e);
       return;
@@ -252,20 +246,16 @@ class SMHApiTransferApis {
       // 匹配成功
       // 计算全部文件sha256
       Digest? fullHash = beginningHash;
-      for (int i = SMHUploadSlinceLength;
-          i < _length;
-          i += SMHUploadSlinceLength) {
+      for (int i = SMHUploadSlinceLength; i < _length; i += SMHUploadSlinceLength) {
         List<int> begin = [];
         begin.addAll(fullHash!.bytes);
 
         if (_uploadBody != null) {
-          var temp = _uploadBody!
-              .sublist(i, i + min(SMHUploadSlinceLength, _length - i));
+          var temp = _uploadBody!.sublist(i, i + min(SMHUploadSlinceLength, _length - i));
           begin.addAll(temp);
           fullHash = sha256.convert(begin);
         } else if (_uploadFile != null) {
-          var temp = _uploadFile!
-              .openRead(i, i + min(SMHUploadSlinceLength, _length - i));
+          var temp = _uploadFile!.openRead(i, i + min(SMHUploadSlinceLength, _length - i));
           begin.addAll(await toBytes(temp));
           fullHash = sha256.convert(begin);
         }
@@ -275,22 +265,16 @@ class SMHApiTransferApis {
       // 校验全部文件
       SMHResponse? response2;
       try {
-        response2 = await SMHApiPostRequest<SMHUploadFileResultEntity>()
-            .request([urlPrefix, _libraryId, _spaceId, _filePath],
-                urlMethod: 'multipart',
-                header: {'x-smh-meta-creation-date': createDate},
-                query: {
-                  'conflict_resolution_strategy':
-                      _conflictResolutionStrategy.name,
-                  'filesize': _length,
-                  'user_id': _userId,
-                  'access_token': accessToken
-                },
-                body: {
-                  'fullHash': fullHash.toString(),
-                  "beginningHash": beginningHash.toString(),
-                  "size": _length
-                });
+        response2 = await SMHApiPostRequest<SMHUploadFileResultEntity>().request([urlPrefix, _libraryId, _spaceId, _filePath],
+            urlMethod: 'multipart',
+            header: {'x-smh-meta-creation-date': createDate},
+            query: {
+              'conflict_resolution_strategy': _conflictResolutionStrategy.name,
+              'filesize': _length,
+              'user_id': _userId,
+              'access_token': accessToken
+            },
+            body: {'fullHash': fullHash.toString(), "beginningHash": beginningHash.toString(), "size": _length});
       } on SMHError catch (e) {
         _finishCalBack(null, e);
         return;
@@ -313,10 +297,7 @@ class SMHApiTransferApis {
         Uint8List.fromList(bytes),
       ),
     );
-    stream.listen((val) => sink.add(val),
-        onError: completer.completeError,
-        onDone: sink.close,
-        cancelOnError: true);
+    stream.listen((val) => sink.add(val), onError: completer.completeError, onDone: sink.close, cancelOnError: true);
     return completer.future;
   }
 
@@ -349,13 +330,10 @@ class SMHApiTransferApis {
 
     try {
       if (_uploadFile != null) {
-        await uploadService!.dio.put(response.data!.path!,
-            data: _uploadFile!.openRead(),
-            options: Options(headers: response.data!.headers!.toJson()));
+        await uploadService!.dio
+            .put(response.data!.path!, data: _uploadFile!.openRead(), options: Options(headers: response.data!.headers!.toJson()));
       } else {
-        await uploadService!.dio.put(response.data!.path!,
-            data: _uploadBody,
-            options: Options(headers: response.data!.headers!.toJson()));
+        await uploadService!.dio.put(response.data!.path!, data: _uploadBody, options: Options(headers: response.data!.headers!.toJson()));
       }
     } on DioError catch (error) {
       SMHError smhError = uploadService!.errorFactory(error);
@@ -414,6 +392,7 @@ class SMHApiTransferApis {
   }
 
   late List<SMHPartUploadItem> _uploadParts;
+
   _continueMultiUpload(SMHPartUploadStateEntity exitUpload) {
     bool isChange = false;
     _exitUploadPart = exitUpload;
@@ -460,9 +439,7 @@ class SMHApiTransferApis {
   }
 
   _getContinueInfo() {
-    if (_exitUploadPart == null ||
-        _exitUploadPart!.parts == null ||
-        _exitUploadPart!.parts!.length == 0) return;
+    if (_exitUploadPart == null || _exitUploadPart!.parts == null || _exitUploadPart!.parts!.length == 0) return;
     _uploadParts = [];
     if (_exitUploadPart!.parts![0].partNumber != 1) return;
     _uploadSize = 0;
@@ -495,14 +472,9 @@ class SMHApiTransferApis {
     }
 
     try {
-      response = await SMHApiPostRequest<SMHUploadFileResultEntity>().request(
-          [urlPrefix, _libraryId, _spaceId, _confirmKey!],
+      response = await SMHApiPostRequest<SMHUploadFileResultEntity>().request([urlPrefix, _libraryId, _spaceId, _confirmKey!],
           urlMethod: 'confirm',
-          query: {
-            'conflict_resolution_strategy': _conflictResolutionStrategy.name,
-            'access_token': accessToken,
-            'user_id': _userId
-          });
+          query: {'conflict_resolution_strategy': _conflictResolutionStrategy.name, 'access_token': accessToken, 'user_id': _userId});
     } on SMHError catch (e) {
       _finishCalBack(null, e);
       return;
@@ -521,11 +493,8 @@ class SMHApiTransferApis {
       if (_slice != null && _slice! > 10) {
         uploadSliceLength = _slice!;
       }
-      uploadSliceLength =
-          _length / uploadSliceLength > 10000 ? maxSlice : uploadSliceLength;
-      slice = restContentLength >= uploadSliceLength
-          ? uploadSliceLength
-          : restContentLength;
+      uploadSliceLength = _length / uploadSliceLength > 10000 ? maxSlice : uploadSliceLength;
+      slice = restContentLength >= uploadSliceLength ? uploadSliceLength : restContentLength;
       SMHPartUploadItem part = SMHPartUploadItem();
       allParts.add(part);
       part.slice = slice;
@@ -550,10 +519,8 @@ class SMHApiTransferApis {
     }
     SMHResponse<SMHPartUploadStateEntity>? response;
     try {
-      response = await SMHApiGetRequest<SMHPartUploadStateEntity>().request(
-          [urlPrefix, _libraryId, _spaceId, _confirmKey!],
-          urlMethod: 'upload',
-          query: {'access_token': accessToken, 'user_id': _userId});
+      response = await SMHApiGetRequest<SMHPartUploadStateEntity>().request([urlPrefix, _libraryId, _spaceId, _confirmKey!],
+          urlMethod: 'upload', query: {'access_token': accessToken, 'user_id': _userId});
     } on SMHError catch (e) {
       _finishCalBack(null, e);
       return;
@@ -564,8 +531,7 @@ class SMHApiTransferApis {
     }
     if (response?.data?.confirmed == true) {
       _finishUpload();
-    } else if (response?.data?.parts == null &&
-        response?.data?.uploadPartInfo == null) {
+    } else if (response?.data?.parts == null && response?.data?.uploadPartInfo == null) {
       _startPartUpload();
     } else {
       _continueMultiUpload(response!.data!);
@@ -598,38 +564,27 @@ class SMHApiTransferApis {
       }
 
       if (_exitUploadPart != null) {
-        header = SMHBeginPartUploadHeaders.fromJson(
-            _exitUploadPart!.uploadPartInfo!.headers!.toJson());
+        header = SMHBeginPartUploadHeaders.fromJson(_exitUploadPart!.uploadPartInfo!.headers!.toJson());
       }
       SMHPartUploadItem item = resetParts[i];
       Response? response;
       try {
-        Options options =
-            Options(headers: {HttpHeaders.contentLengthHeader: item.slice});
+        Options options = Options(headers: {HttpHeaders.contentLengthHeader: item.slice});
         options.headers!.addAll(header.toJson());
         if (_uploadFile != null) {
           response = await uploadService!.dio.put(path,
-              queryParameters: {
-                'partNumber': (item.index + 1).toString(),
-                'uploadId': uploadId
-              },
-              data:
-                  _uploadFile!.openRead(item.offset, item.offset + item.slice),
+              queryParameters: {'partNumber': (item.index + 1).toString(), 'uploadId': uploadId},
+              data: _uploadFile!.openRead(item.offset, item.offset + item.slice),
               options: options, onSendProgress: (count, total) {
             if (_onSendProgress != null) {
               _onSendProgress!(_uploadSize + count, _length);
             }
           });
         } else {
-          Iterable<List<int>> data = [
-            _uploadBody!.sublist(item.offset, item.offset + item.slice)
-          ].map((e) => e);
+          Iterable<List<int>> data = [_uploadBody!.sublist(item.offset, item.offset + item.slice)].map((e) => e);
           Stream<List<int>> stream = Stream.fromIterable(data);
           response = await uploadService!.dio.put(path,
-              queryParameters: {
-                'partNumber': (item.index + 1).toString(),
-                'uploadId': uploadId
-              },
+              queryParameters: {'partNumber': (item.index + 1).toString(), 'uploadId': uploadId},
               data: stream,
               options: options, onSendProgress: (count, total) {
             if (_onSendProgress != null) {
@@ -656,19 +611,15 @@ class SMHApiTransferApis {
           }
         } catch (_) {}
         if (_uploadFile != null) {
-          localMd5 = await SMHMD5Utils.smhFile2md5(_uploadFile!,
-              start: item.offset, end: item.offset + item.slice);
+          localMd5 = await SMHMD5Utils.smhFile2md5(_uploadFile!, start: item.offset, end: item.offset + item.slice);
         } else if (_uploadBody != null) {
-          localMd5 = SMHMD5Utils.smhData2md5(
-              _uploadBody!.sublist(item.offset, item.offset + item.slice));
+          localMd5 = SMHMD5Utils.smhData2md5(_uploadBody!.sublist(item.offset, item.offset + item.slice));
         }
         if (etag != localMd5) {
           SMHError error = SMHError();
           error.smhCode = 'DataIntegrityError';
-          error.smhMessage =
-              '分片:上传过程中MD5校验与本地不一致，请检查本地文件在上传过程中是否发生了变化,建议调用删除接口将COS上的文件删除并重新上传,本地计算的 MD5 值:$localMd5, 返回的 ETag值:$etag';
-          error.smhZhMessage =
-              '分片:上传过程中MD5校验与本地不一致，请检查本地文件在上传过程中是否发生了变化,建议调用删除接口将COS上的文件删除并重新上传,本地计算的 MD5 值:$localMd5, 返回的 ETag值:$etag';
+          error.smhMessage = '分片:上传过程中MD5校验与本地不一致，请检查本地文件在上传过程中是否发生了变化,建议调用删除接口将COS上的文件删除并重新上传,本地计算的 MD5 值:$localMd5, 返回的 ETag值:$etag';
+          error.smhZhMessage = '分片:上传过程中MD5校验与本地不一致，请检查本地文件在上传过程中是否发生了变化,建议调用删除接口将COS上的文件删除并重新上传,本地计算的 MD5 值:$localMd5, 返回的 ETag值:$etag';
           _finishCalBack(null, error);
           return;
         }
@@ -688,14 +639,10 @@ class SMHApiTransferApis {
     }
 
     if (_beginPartUploadInfo != null || _exitUploadPart != null) {
-      String? expirationTime = _beginPartUploadInfo?.expiration ??
-          _exitUploadPart?.uploadPartInfo?.expiration ??
-          null;
+      String? expirationTime = _beginPartUploadInfo?.expiration ?? _exitUploadPart?.uploadPartInfo?.expiration ?? null;
       if (expirationTime != null) {
-        final expiration =
-            DateFormat('yyyy-MM-ddTHH:mm:ss').parseUTC(expirationTime);
-        if (expiration.isAfter(
-            DateTime.now().add(Duration(seconds: 300 - _localtimeOffset)))) {
+        final expiration = DateFormat('yyyy-MM-ddTHH:mm:ss').parseUTC(expirationTime);
+        if (expiration.isAfter(DateTime.now().add(Duration(seconds: 300 - _localtimeOffset)))) {
           return;
         }
       }
@@ -704,10 +651,8 @@ class SMHApiTransferApis {
     Future.microtask(() async {
       SMHResponse? response;
       try {
-        response = await SMHApiPostRequest().request(
-            [urlPrefix, _libraryId, _spaceId, _confirmKey!],
-            urlMethod: 'renew',
-            query: {'access_token': _mAccessToken, 'user_id': _userId});
+        response = await SMHApiPostRequest().request([urlPrefix, _libraryId, _spaceId, _confirmKey!],
+            urlMethod: 'renew', query: {'access_token': _mAccessToken, 'user_id': _userId});
       } on SMHError catch (e) {
         _finishCalBack(null, e);
         return;
@@ -836,10 +781,8 @@ class SMHApiTransferApis {
     query.addKeyWithObject('purpose', 'download');
     query.addKeyWithObject('access_token', _mAccessToken);
     query.addKeyWithObject('user_id', userId);
-    SMHAPIService apiServices = SMHServicesManager
-        .servicesManager.serviceMap[SMHAPIServiceKey] as SMHAPIService;
-    SMHTransferService downloadService =
-        SMHTransferService(apiServices.baseUrl);
+    SMHAPIService apiServices = SMHServicesManager.servicesManager.serviceMap[SMHAPIServiceKey] as SMHAPIService;
+    SMHTransferService downloadService = SMHTransferService(apiServices.baseUrl);
     Response? response;
     try {
       Options options = Options(headers: {'Range': 'bytes=$offset-'});
@@ -864,7 +807,7 @@ class SMHApiTransferApis {
       if (SMHAccessTokenInterceptor.checkAccessTokenError(e)) {
         _mAccessToken = null;
       }
-      if ((await SMHRetryInterceptor.shouldRetry(e)) && retryCount < 3) {
+      if ((await SMHRetryInterceptor.shouldRetry(e as DioExceptionType)) && retryCount < 3) {
         _retryDownloadTask(
           libraryId,
           spaceId,
@@ -892,12 +835,10 @@ class SMHApiTransferApis {
       try {
         crc64 = response.data.headers['x-cos-hash-crc64ecma'][0];
       } catch (_) {}
-      if (crc64 != null &&
-          SMHCRC64Utils.calculateCRC64(localPath, crc64) == false) {
+      if (crc64 != null && SMHCRC64Utils.calculateCRC64(localPath, crc64) == false) {
         SMHError error = SMHError();
         error.smhCode = 'Crc64VerificationFails';
-        error.smhMessage =
-            'The server file has been changed. Please download it again.';
+        error.smhMessage = 'The server file has been changed. Please download it again.';
         error.smhZhMessage = '服务端文件已改变请重新下载。';
 
         /// 校验不同过，删除本地文件。
@@ -936,21 +877,17 @@ class SMHApiTransferApis {
 
     if (_mAccessToken == null ||
         _accessTokenExpirationTime == null ||
-        (_accessTokenExpirationTime != null &&
-            DateTime.now().isAfter(_accessTokenExpirationTime!))) {
+        (_accessTokenExpirationTime != null && DateTime.now().isAfter(_accessTokenExpirationTime!))) {
       SMHAccessTokenEntity? accessTokenEntity;
       try {
-        SMHTransferAccessTokenHandle handle =
-            SMHTransferAccessTokenHandle(_orgId!, _userToken!);
-        accessTokenEntity =
-            await handle.refreshAccessToken(_spaceId, _spaceOrgId);
+        SMHTransferAccessTokenHandle handle = SMHTransferAccessTokenHandle(_orgId!, _userToken!);
+        accessTokenEntity = await handle.refreshAccessToken(_spaceId, _spaceOrgId);
       } on SMHError catch (e) {
         throw e;
       }
       if (accessTokenEntity != null) {
         _mAccessToken = accessTokenEntity.accessToken!;
-        _accessTokenExpirationTime =
-            DateTime.now().add(Duration(seconds: accessTokenEntity.expiresIn!));
+        _accessTokenExpirationTime = DateTime.now().add(Duration(seconds: accessTokenEntity.expiresIn!));
       }
     }
     return _mAccessToken;
@@ -981,7 +918,7 @@ class SMHApiTransferApis {
         cancelToken: cancelToken,
       );
     } on DioError catch (e) {
-      if (e.type == DioErrorType.response) {
+      if (e.type == DioExceptionType.badResponse) {
         e.response!.data = null;
       }
       rethrow;
@@ -1043,7 +980,7 @@ class SMHApiTransferApis {
           try {
             await subscription.cancel();
           } finally {
-            completer.completeError(DioMixin.assureDioError(
+            completer.completeError(DioMixin.assureDioException(
               err,
               response.requestOptions,
             ));
@@ -1057,7 +994,7 @@ class SMHApiTransferApis {
           await raf.close();
           completer.complete(response);
         } catch (e) {
-          completer.completeError(DioMixin.assureDioError(
+          completer.completeError(DioMixin.assureDioException(
             e,
             response.requestOptions,
           ));
@@ -1067,7 +1004,7 @@ class SMHApiTransferApis {
         try {
           await _closeAndDelete();
         } finally {
-          completer.completeError(DioMixin.assureDioError(
+          completer.completeError(DioMixin.assureDioException(
             e,
             response.requestOptions,
           ));
@@ -1081,19 +1018,18 @@ class SMHApiTransferApis {
       await _closeAndDelete();
     });
 
-    if (response.requestOptions.receiveTimeout > 0) {
+    if ((response.requestOptions.receiveTimeout)!.inSeconds > 0) {
       future = future
-          .timeout(Duration(
-        milliseconds: response.requestOptions.receiveTimeout,
-      ))
+          .timeout(
+        response.requestOptions.receiveTimeout!,
+      )
           .catchError((Object err) async {
         await subscription.cancel();
         await _closeAndDelete();
         if (err is TimeoutException) {
           throw DioError(
             requestOptions: response.requestOptions,
-            error:
-                'Receiving data timeout[${response.requestOptions.receiveTimeout}ms]',
+            error: 'Receiving data timeout[${response.requestOptions.receiveTimeout}ms]',
             type: DioErrorType.receiveTimeout,
           );
         } else {
@@ -1108,9 +1044,7 @@ class SMHApiTransferApis {
     try {
       if (headers['date'] != null) {
         List dateList = headers['date'] as List;
-        DateTime serviceTime =
-            DateFormat("EEE',' dd' 'MMM' 'yyyy HH':'mm':'ss 'GMT'")
-                .parseUTC(dateList.first);
+        DateTime serviceTime = DateFormat("EEE',' dd' 'MMM' 'yyyy HH':'mm':'ss 'GMT'").parseUTC(dateList.first);
         _localtimeOffset = DateTime.now().difference(serviceTime).inSeconds;
       } else {
         _localtimeOffset = 0;

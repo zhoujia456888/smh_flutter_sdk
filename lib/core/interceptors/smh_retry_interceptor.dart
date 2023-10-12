@@ -10,8 +10,8 @@ class SMHRetryInterceptor extends QueuedInterceptorsWrapper {
   SMHRetryInterceptor(this.requestRetrier);
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
-    if (shouldRetry(err)) {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (shouldRetry(err.type)) {
       Response? response;
       try {
         response = await _retry(
@@ -46,10 +46,10 @@ class SMHRetryInterceptor extends QueuedInterceptorsWrapper {
     return response;
   }
 
-  static bool shouldRetry(DioError err) {
+  static bool shouldRetry(DioExceptionType err) {
     bool isNoNet =
-        (err.type == DioErrorType.other && (err.error is SocketException));
-    bool need = isNoNet || err.type == DioErrorType.connectTimeout;
+        (err == DioExceptionType.unknown && (err is SocketException));
+    bool need = isNoNet || err == DioExceptionType.connectionTimeout;
     return need;
   }
 }

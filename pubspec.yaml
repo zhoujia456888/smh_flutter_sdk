@@ -8,10 +8,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: 4.0.6
+  dio: ^5.3.3
   crclib: ^3.0.0
   convert: ^3.1.1
   connectivity_plus: ^5.0.0
   crypto: ^3.0.3
   intl: ^0.18.1
-  package_info_plus: ^5.0.0
+  package_info_plus: ^4.1.0

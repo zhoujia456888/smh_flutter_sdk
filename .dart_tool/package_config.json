@@ -75,9 +75,9 @@
     },
     {
       "name": "dio",
-      "rootUri": "file:///Users/zhoujia/.pub-cache/hosted/pub.flutter-io.cn/dio-4.0.6",
+      "rootUri": "file:///Users/zhoujia/.pub-cache/hosted/pub.flutter-io.cn/dio-5.3.3",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.15"
     },
     {
       "name": "ffi",
@@ -141,7 +141,7 @@
     },
     {
       "name": "package_info_plus",
-      "rootUri": "file:///Users/zhoujia/.pub-cache/hosted/pub.flutter-io.cn/package_info_plus-5.0.0",
+      "rootUri": "file:///Users/zhoujia/.pub-cache/hosted/pub.flutter-io.cn/package_info_plus-4.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
@@ -236,7 +236,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-10-10T03:04:05.961085Z",
+  "generated": "2023-10-12T08:00:50.609481Z",
   "generator": "pub",
   "generatorVersion": "3.1.3"
 }
